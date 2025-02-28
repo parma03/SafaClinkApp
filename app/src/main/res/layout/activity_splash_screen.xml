@@ -6,35 +6,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SplashScreen"
-    android:background="#fece2f">
+    android:background="@color/background">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imglogo"
         android:layout_width="0dp"
         android:layout_height="300dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="10dp"
+        android:transitionName="logo_image"
         android:src="@mipmap/icon_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/txtlogo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/bangers"
+        android:transitionName="logo_text"
         android:text="Safa Clink"
         android:textAlignment="center"
         android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imglogo" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txtslogan"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -44,6 +46,6 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/txtlogo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
