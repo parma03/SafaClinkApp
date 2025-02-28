@@ -44,4 +44,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.android.networking)
+    implementation (libs.spots.dialog)
+    implementation (libs.popup.dialog)
+
 }
