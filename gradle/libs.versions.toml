@@ -1,6 +1,7 @@
 [versions]
-agp = "8.8.2"
+agp = "8.8.0"
 androidNetworking = "1.0.4"
+databindingRuntime = "8.8.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -9,10 +10,11 @@ material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 popupDialog = "2.0.0"
-spotsDialog = "1.1"
+spotsDialog = "0.7"
 
 [libraries]
 android-networking = { module = "com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking", version.ref = "androidNetworking" }
+databinding-runtime = { module = "androidx.databinding:databinding-runtime", version.ref = "databindingRuntime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

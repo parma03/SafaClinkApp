@@ -1,23 +1,18 @@
 <?php
-include_once 'dbconnect.php';
+$conn = include 'dbconnect.php';
 
-// Function to check if database exists
-function database_exists() {
-    global $conn;
-
-    // Check if we can query a table (this assumes at least one table exists)
-    $result = mysqli_query($conn, "SHOW TABLES");
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        return true;
-    }
-
-    return false;
+if (!$conn) {
+    echo json_encode(['success' => false, 'message' => 'Database tidak ditemukan. Migrasi diperlukan.']);
+    exit;
 }
 
-if (database_exists()) {
-    echo json_encode(array('success' => true, 'message' => 'Database exists.'));
+// Cek apakah tabel sudah ada
+$result = mysqli_query($conn, "SHOW TABLES");
+if ($result && mysqli_num_rows($result) > 0) {
+    echo json_encode(['success' => true, 'message' => 'Database dan tabel ada.']);
 } else {
-    echo json_encode(array('success' => false, 'message' => 'Database does not exist or is empty.'));
+    echo json_encode(['success' => false, 'message' => 'Database ada tetapi kosong.']);
 }
+
+mysqli_close($conn);
 ?>

@@ -2,9 +2,9 @@ package com.example.safaclink.apiserver;
 
 public class ApiServer {
     //development
-//    private static final String URL = "ngrok";
+    private static final String URL = "https://343b-182-3-39-57.ngrok-free.app/fauzan/SafaClinkApp/app/src/main/java/com/example/safaclink/phpserver/";
     //local
-    private static final String URL = "http://127.0.0.1/fauzan/SafaClinkApp/app/src/main/java/com/example/safaclink/phpserver/";
+//    private static final String URL = "http://127.0.0.1/fauzan/SafaClinkApp/app/src/main/java/com/example/safaclink/phpserver/";
     public static final String site_url_admin = URL+"admin/";
     public static final String site_url_konsumen = URL+"konsumen/";
     public static final String site_url_owner = URL+"owner/";

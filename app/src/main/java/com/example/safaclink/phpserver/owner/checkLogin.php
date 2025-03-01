@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM tb_user WHERE email='$username' AND password='$password' AND role='Administrator'";
+    $query = "SELECT * FROM tb_user WHERE email='$username' AND password='$password' AND role='Owner'";
     $execute = mysqli_query($conn, $query);
     $check = mysqli_affected_rows($conn);
     if ($check > 0) {

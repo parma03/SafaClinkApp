@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -36,9 +37,9 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private PrefManager prefManager;
-    private Dialog loadingDialog, loadingMigration, successMigration, errorMigration;
+    private Dialog loadingDialog, loadingMigration, errorMigration;
     private static final String URL_CHECK_LOGIN_ADMIN = ApiServer.site_url_admin + "checkLogin.php";
-    private static final String URL_CHECK_LOGIN_PELANGGAN = ApiServer.site_url_konsumen + "checkLogin.php";
+    private static final String URL_CHECK_LOGIN_KONSUMEN= ApiServer.site_url_konsumen + "checkLogin.php";
     private static final String URL_CHECK_LOGIN_OWNER = ApiServer.site_url_owner + "checkLogin.php";
 
     @Override
@@ -55,7 +56,13 @@ public class MainActivity extends AppCompatActivity {
         AndroidNetworking.initialize(this);
         prefManager = new PrefManager(this);
 
+        initLoadingDialog();
+        initLoadingMigration();
+        initErrorMigration();
+
         checkDatabase();
+        hideLoadingMigration();
+        hideLoading();
 
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,10 +92,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDatabase() {
-        loadingMigration().show();
+        showLoadingMigration();
 
-        // Define URL for checking database existence
         String URL_CHECK_DB = ApiServer.db_set + "checkdb.php";
+        Log.d("response", "Checking database at: " + URL_CHECK_DB);
 
         AndroidNetworking.get(URL_CHECK_DB)
                 .setPriority(Priority.HIGH)
@@ -96,35 +103,35 @@ public class MainActivity extends AppCompatActivity {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        loadingMigration.dismiss();
                         try {
-                            // If response contains success code, database exists
+                            hideLoadingMigration();
+                            Log.d("response", "Response: " + response);
                             if (response.has("success") && response.getBoolean("success")) {
-                                // Database exists, continue with normal app flow
-                                // No need to show successMigration dialog here
+                                Log.d("DatabaseCheck", "Database exists, no migration needed.");
                             } else {
-                                // Database doesn't exist, perform migration
+                                Log.d("DatabaseCheck", "Database not found, starting migration...");
                                 migrateDatabase();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            errorMigration().show();
+                            showErrorMigration();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        loadingMigration.dismiss();
-                        errorMigration().show();
+                        hideLoadingMigration();
+                        Log.e("DatabaseCheck", "Database check failed: " + anError.getErrorDetail());
+                        showErrorMigration();
                     }
                 });
     }
 
     private void migrateDatabase() {
-        loadingMigration().show();
+        showLoadingMigration();
 
-        // Define URL for database migration
         String URL_MIGRATE_DB = ApiServer.db_set + "migratedb.php";
+        Log.d("response", "Migrating database at: " + URL_MIGRATE_DB);
 
         AndroidNetworking.get(URL_MIGRATE_DB)
                 .setPriority(Priority.HIGH)
@@ -132,38 +139,39 @@ public class MainActivity extends AppCompatActivity {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        loadingMigration.dismiss();
                         try {
+                            hideLoadingMigration();
+                            Log.d("response", "Response: " + response);
                             if (response.has("success") && response.getBoolean("success")) {
-                                // Migration successful - ONLY show success dialog here
-                                successMigration().show();
+                                showSuccessMigration();
+                                hideLoadingMigration();
                             } else {
-                                // Migration failed
-                                errorMigration().show();
+                                showErrorMigration();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            errorMigration().show();
+                            showErrorMigration();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        loadingMigration.dismiss();
-                        errorMigration().show();
+                        hideLoadingMigration();
+                        showErrorMigration();
                     }
                 });
     }
 
     private void login() {
-        loadingPopUp().show();
+        showLoading();
 
         String username = Objects.requireNonNull(binding.txtUsername.getText()).toString().trim();
         String password = Objects.requireNonNull(binding.txtPassword.getText()).toString();
 
         if (username.isEmpty() || password.isEmpty()) {
             showEmptyFieldsDialog();
-            loadingPopUp().dismiss();
+            hideLoading();
+            return;
         }
 
         AndroidNetworking.post(URL_CHECK_LOGIN_ADMIN)
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            loadingDialog.dismiss();
+                            hideLoading();
                             if (response.getString("code").equals("1")) {
                                 JSONArray array = response.getJSONArray("data");
                                 JSONObject object = array.getJSONObject(0);
@@ -198,29 +206,28 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            loadingDialog.dismiss();
+                            hideLoading();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        loadingDialog.dismiss();
+                        hideLoading();
                     }
                 });
     }
 
     private void loginKonsumen() {
-        loadingPopUp().show();
-
         String username = Objects.requireNonNull(binding.txtUsername.getText()).toString().trim();
         String password = Objects.requireNonNull(binding.txtPassword.getText()).toString();
 
         if (username.isEmpty() || password.isEmpty()) {
             showEmptyFieldsDialog();
-            loadingPopUp().dismiss();
+            hideLoading();
+            return;
         }
 
-        AndroidNetworking.post(URL_CHECK_LOGIN_ADMIN)
+        AndroidNetworking.post(URL_CHECK_LOGIN_KONSUMEN)
                 .addBodyParameter("username", username)
                 .addBodyParameter("password", password)
                 .setPriority(Priority.MEDIUM)
@@ -229,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            loadingDialog.dismiss();
+                            hideLoading();
                             if (response.getString("code").equals("1")) {
                                 JSONArray array = response.getJSONArray("data");
                                 JSONObject object = array.getJSONObject(0);
@@ -252,29 +259,28 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            loadingDialog.dismiss();
+                            hideLoading();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        loadingDialog.dismiss();
+                        hideLoading();
                     }
                 });
     }
 
     private void loginOwner() {
-        loadingPopUp().show();
-
         String username = Objects.requireNonNull(binding.txtUsername.getText()).toString().trim();
         String password = Objects.requireNonNull(binding.txtPassword.getText()).toString();
 
         if (username.isEmpty() || password.isEmpty()) {
             showEmptyFieldsDialog();
-            loadingPopUp().dismiss();
+            hideLoading();
+            return;
         }
 
-        AndroidNetworking.post(URL_CHECK_LOGIN_ADMIN)
+        AndroidNetworking.post(URL_CHECK_LOGIN_OWNER)
                 .addBodyParameter("username", username)
                 .addBodyParameter("password", password)
                 .setPriority(Priority.MEDIUM)
@@ -283,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            loadingDialog.dismiss();
+                            hideLoading();
                             if (response.getString("code").equals("1")) {
                                 JSONArray array = response.getJSONArray("data");
                                 JSONObject object = array.getJSONObject(0);
@@ -306,56 +312,89 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            loadingDialog.dismiss();
+                            hideLoading();
                         }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        loadingDialog.dismiss();
+                        hideLoading();
                     }
                 });
     }
 
-    private Dialog loadingMigration() {
+    private void initLoadingMigration() {
         loadingMigration = PopupDialog.getInstance(MainActivity.this)
                 .progressDialogBuilder()
                 .createLottieDialog()
-                .setRawRes(R.raw.success)
+                .setRawRes(R.raw.migration)
                 .setCancelable(false)
                 .build().getDialog();
-        return loadingMigration;
     }
 
-    private Dialog successMigration() {
-        successMigration = PopupDialog.getInstance(MainActivity.this)
+    private void showLoadingMigration() {
+        if (loadingMigration != null && !loadingMigration.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    private void hideLoadingMigration() {
+        if (loadingMigration != null && loadingMigration.isShowing()) {
+            loadingMigration.dismiss();
+        }
+    }
+
+    private void showSuccessMigration() {
+        PopupDialog.getInstance(MainActivity.this)
                 .statusDialogBuilder()
                 .createSuccessDialog()
                 .setCancelable(false)
                 .setHeading("Well Done")
                 .setDescription("Migration Completed")
-                .build(Dialog::dismiss).getDialog();
-        return successMigration;
+                .build(Dialog::dismiss)
+                .show();
     }
 
-    private Dialog errorMigration() {
+    private void initErrorMigration() {
         errorMigration = PopupDialog.getInstance(MainActivity.this)
                 .progressDialogBuilder()
                 .createLottieDialog()
-                .setCancelable(false)
-                .setRawRes(R.raw.success)
+                .setCancelable(true)
+                .setRawRes(R.raw.error)
                 .build().getDialog();
-        return errorMigration;
     }
 
-    private Dialog loadingPopUp() {
+    private void showErrorMigration() {
+        if (errorMigration != null && !errorMigration.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    private void hideErrorMigration() {
+        if (errorMigration != null && errorMigration.isShowing()) {
+            errorMigration.dismiss();
+        }
+    }
+
+    private void initLoadingDialog() {
         loadingDialog = PopupDialog.getInstance(MainActivity.this)
                 .progressDialogBuilder()
                 .createProgressDialog()
                 .setTint(R.color.red)
                 .setCancelable(false)
                 .build().getDialog();
-        return loadingDialog;
+    }
+
+    private void showLoading() {
+        if (loadingDialog != null && !loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    private void hideLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 
     public void loginGagalPopUp() {
@@ -367,14 +406,17 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .build(Dialog::dismiss)
                 .show();
+        hideLoading();
     }
 
     private void showEmptyFieldsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Error");
-        builder.setMessage("Isi Username Dan Password.");
-        builder.setPositiveButton("OK", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        PopupDialog.getInstance(MainActivity.this)
+                .statusDialogBuilder()
+                .createWarningDialog()
+                .setHeading("WARNING !!!")
+                .setDescription("Isi Username Dan Password.")
+                .setCancelable(false)
+                .build(Dialog::dismiss)
+                .show();
     }
 }
