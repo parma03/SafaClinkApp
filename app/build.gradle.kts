@@ -49,5 +49,7 @@ dependencies {
     implementation (libs.popup.dialog)
     implementation(libs.spots.dialog)
     implementation (libs.databinding.runtime)
+    implementation(libs.picasso)
+    implementation(libs.swipereveallayout)
 
 }

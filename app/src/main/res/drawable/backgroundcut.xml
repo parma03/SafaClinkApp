@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="500dp"
+    android:height="150dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Lapisan pertama (warna utama) -->
+    <path
+        android:fillColor="@color/backgroundmelt"
+        android:pathData="M0,0 L200,0 L200,140 C170,180 130,100 90,150 C50,200 10,120 0,140 Z" />
+
+    <!-- Lapisan kedua (warna lebih gelap untuk efek kedalaman) -->
+    <path
+        android:fillColor="@color/backgroundmelt"
+        android:pathData="M10,0 L190,0 L190,150 C160,190 120,110 80,160 C40,210 0,130 10,150 Z" />
+
+    <!-- Lapisan ketiga (warna lebih gelap lagi untuk efek lebih dalam) -->
+    <path
+        android:fillColor="@color/backgroundmelt"
+        android:pathData="M30,0 L170,0 L170,160 C140,200 100,120 60,170 C20,220 -10,140 30,160 Z" />
+
+</vector>

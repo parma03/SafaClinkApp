@@ -11,4 +11,7 @@
     <color name="background">#FFFFFF</color>
     <color name="bg_btn">#000000</color>
     <color name="text">#FFFFFF</color>
+    <color name="textColor">#000000</color>
+    <color name="backgroundmelt">#000000</color>
+
 </resources>

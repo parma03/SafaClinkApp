@@ -8,8 +8,9 @@ public class UserModel {
     public String username;
     public String password;
     public String profile;
+    public String role;
 
-    public UserModel(String id_user, String nama, String nohp, String email, String username, String password, String profile) {
+    public UserModel(String id_user, String nama, String nohp, String email, String username, String password, String profile, String role) {
         this.id_user = id_user;
         this.nama = nama;
         this.nohp = nohp;
@@ -17,6 +18,7 @@ public class UserModel {
         this.username = username;
         this.password = password;
         this.profile = profile;
+        this.role = role;
     }
 
     public String getId_user() {
@@ -25,6 +27,14 @@ public class UserModel {
 
     public void setId_user(String id_user) {
         this.id_user = id_user;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getNama() {
