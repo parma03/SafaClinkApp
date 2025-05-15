@@ -39,7 +39,7 @@ public class DialogUpdateUserActivity extends AppCompatDialogFragment {
     private String id_user, nama, nohp, email, username, password, role;
     private Spinner editSpinnerRole;
     private static final String URL_UPDATE_USER =
-            ApiServer.site_url_admin + "updateUser.php";
+            ApiServer.site_url_admin + "updateAdmin.php";
 
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

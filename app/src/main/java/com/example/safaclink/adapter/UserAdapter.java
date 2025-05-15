@@ -2,7 +2,6 @@ package com.example.safaclink.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +26,7 @@ import com.example.safaclink.R;
 import com.example.safaclink.activity.admin.DialogDetailUserActivity;
 import com.example.safaclink.activity.admin.DialogUpdateUserActivity;
 import com.example.safaclink.activity.admin.TabAdminFragment;
+import com.example.safaclink.activity.admin.UserActivity;
 import com.example.safaclink.apiserver.ApiServer;
 import com.example.safaclink.model.UserModel;
 import com.saadahmedev.popupdialog.PopupDialog;
@@ -51,22 +51,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
     @Override
     public UserAdapter.UserModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.row_user, null);
+        View view = inflater.inflate(R.layout.row_user, parent, false);
         return new UserAdapter.UserModelViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserModelViewHolder holder, int position) {
         UserModel userModel = userModelList.get(position);
-        holder.txtName.setText("Nama: "+userModel.getNama());
-        holder.txtRole.setText(userModel.getRole());
-        if (userModel.getProfile() != null || !userModel.getProfile().equals("null")) {
+        if (holder.txtName != null) {
+            holder.txtName.setText("Nama: " + userModel.getNama());
+        }
+
+        if (holder.txtRole != null) {
+            holder.txtRole.setText(userModel.getRole());
+        }
+
+        if (userModel.getProfile() != null && !userModel.getProfile().equals("null")) {
             Picasso.get()
                     .load(ApiServer.site_url_fotoProfile + userModel.getProfile())
                     .into(holder.imgProfile);
         } else {
             holder.imgProfile.setImageResource(R.mipmap.icon_user_foreground);
         }
+
 
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,40 +159,48 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
     }
 
     private void UpdateUserList() {
-        Fragment AdminFrament = new TabAdminFragment();
-        AppCompatActivity activity = (AppCompatActivity) context;
-        FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-        notifyDataSetChanged();
+        if (listener != null) {
+            listener.onUserListChanged();
+        }
     }
+
+    public interface OnUserListChangedListener {
+        void onUserListChanged();
+    }
+
+    private OnUserListChangedListener listener;
+
+    public void setOnUserListChangedListener(OnUserListChangedListener listener) {
+        this.listener = listener;
+    }
+
 
     private void showSuccessNotification(String message) {
         PopupDialog.getInstance(context)
-                .setStyle(Styles.SUCCESS)
-                .setHeading("BERHASIL !!!")
-                .setDescription(message)
+                .statusDialogBuilder()
+                .createSuccessDialog()
                 .setCancelable(false)
-                .showDialog(new OnDialogButtonClickListener() {
-                    @Override
-                    public void onDismissClicked(Dialog dialog) {
-                        UpdateUserList();
-                        super.onDismissClicked(dialog);
-                    }
-                });
+                .setHeading("Berhasil")
+                .setDescription(message)
+                .build(dialog -> {
+                    UpdateUserList();
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void showErrorNotification(String message) {
         PopupDialog.getInstance(context)
-                .setStyle(Styles.FAILED)
-                .setHeading("GAGAL !!!")
+                .statusDialogBuilder()
+                .createErrorDialog()
+                .setHeading("Berhasil")
                 .setDescription(message)
-                .setCancelable(false)
-                .showDialog(new OnDialogButtonClickListener() {
-                    @Override
-                    public void onDismissClicked(Dialog dialog) {
-                        UpdateUserList();
-                        super.onDismissClicked(dialog);
-                    }
-                });
+                .setCancelable(true)
+                .build(dialog -> {
+                    UpdateUserList();
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     public int getItemCount() {
@@ -208,57 +223,46 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
                             String message = response.getString("message");
                             if ("User berhasil dihapus".equals(message)) {
                                 PopupDialog.getInstance(context)
-                                        .setStyle(Styles.SUCCESS)
+                                        .statusDialogBuilder()
+                                        .createSuccessDialog()
                                         .setHeading("BERHASIL !!!")
                                         .setDescription("Hapus Data User Berhasil")
                                         .setCancelable(false)
-                                        .showDialog(new OnDialogButtonClickListener() {
-                                            @Override
-                                            public void onDismissClicked(Dialog dialog) {
-                                                super.onDismissClicked(dialog);
-                                            }
-                                        });
+                                        .build(Dialog::dismiss)
+                                        .show();
                             } else {
                                 PopupDialog.getInstance(context)
-                                        .setStyle(Styles.FAILED)
+                                        .statusDialogBuilder()
+                                        .createSuccessDialog()
                                         .setHeading("GAGAL !!!")
                                         .setDescription("Gagal Hapus Data User")
                                         .setCancelable(false)
-                                        .showDialog(new OnDialogButtonClickListener() {
-                                            @Override
-                                            public void onDismissClicked(Dialog dialog) {
-                                                super.onDismissClicked(dialog);
-                                            }
-                                        });
+                                        .build(Dialog::dismiss)
+                                        .show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             PopupDialog.getInstance(context)
-                                    .setStyle(Styles.FAILED)
+                                    .statusDialogBuilder()
+                                    .createSuccessDialog()
                                     .setHeading("GAGAL !!!")
                                     .setDescription("Gagal Hapus Data User")
                                     .setCancelable(false)
-                                    .showDialog(new OnDialogButtonClickListener() {
-                                        @Override
-                                        public void onDismissClicked(Dialog dialog) {
-                                            super.onDismissClicked(dialog);
-                                        }
-                                    });                        }
+                                    .build(Dialog::dismiss)
+                                    .show();
+                        }
                     }
 
                     @Override
                     public void onError(ANError anError) {
                         PopupDialog.getInstance(context)
-                                .setStyle(Styles.FAILED)
+                                .statusDialogBuilder()
+                                .createSuccessDialog()
                                 .setHeading("GAGAL !!!")
                                 .setDescription("Gagal Hapus : "+ anError.getErrorBody())
                                 .setCancelable(false)
-                                .showDialog(new OnDialogButtonClickListener() {
-                                    @Override
-                                    public void onDismissClicked(Dialog dialog) {
-                                        super.onDismissClicked(dialog);
-                                    }
-                                });
+                                .build(Dialog::dismiss)
+                                .show();
                         Toast.makeText(context, "Hapus gagal: " + anError.getErrorBody(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -275,7 +279,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
         public UserModelViewHolder(@NonNull View itemView) {
             super(itemView);
             card = itemView.findViewById(R.id.card);
-            txtName = itemView.findViewById(R.id.txtName);
+            txtName = itemView.findViewById(R.id.txtNama);
             txtRole = itemView.findViewById(R.id.txtRole);
             imgProfile = itemView.findViewById(R.id.imgProfile);
             layoutDelete = itemView.findViewById(R.id.layoutDelete);

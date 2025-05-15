@@ -49,9 +49,9 @@ public class UserActivity extends AppCompatActivity {
                 case 1:
                     tab.setText("Konsumen");
                     break;
-                case 2:
-                    tab.setText("Owner");
-                    break;
+//                case 2:
+//                    tab.setText("Owner");
+//                    break;
             }
         }).attach();
     }
