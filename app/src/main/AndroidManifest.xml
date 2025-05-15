@@ -16,6 +16,9 @@
         android:theme="@style/Theme.SafaClink"
         tools:targetApi="31">
         <activity
+            android:name=".activity.admin.DialogAddUserActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.admin.DialogDetailUserActivity"
             android:exported="false" />
         <activity

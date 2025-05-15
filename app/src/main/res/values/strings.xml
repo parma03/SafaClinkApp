@@ -4,7 +4,7 @@
         <item>Pilih Role</item>
         <item>Konsumen</item>
         <item>Administrator</item>
-<!--        <item>Owner</item>-->
+        <!--        <item>Owner</item>-->
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

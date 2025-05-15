@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:id="@+id/main"
     tools:context=".activity.admin.UserActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -15,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:tabGravity="center"
+            app:tabGravity="fill"
             app:tabIndicatorColor="@android:color/holo_blue_bright"
             app:tabMode="fixed">
         </com.google.android.material.tabs.TabLayout>

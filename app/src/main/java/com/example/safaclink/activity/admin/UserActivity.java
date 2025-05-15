@@ -9,10 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.androidnetworking.AndroidNetworking;
 import com.example.safaclink.R;
 import com.example.safaclink.adapter.TabUserAdapter;
-import com.example.safaclink.databinding.ActivityMainAdminBinding;
 import com.example.safaclink.databinding.ActivityUserBinding;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;

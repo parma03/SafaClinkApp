@@ -37,7 +37,7 @@ import java.util.List;
 
 import dmax.dialog.SpotsDialog;
 
-public class TabAdminFragment extends Fragment {
+public class TabAdminFragment extends Fragment implements DialogAddUserActivity.OnUserAddedListener {
     private FragmentTabAdminBinding binding;
     private List<UserModel> userModelList;
     private UserAdapter userAdapter;
@@ -57,6 +57,13 @@ public class TabAdminFragment extends Fragment {
 
         initLoadingDialog();
         dataAdmin();
+
+        binding.btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAddDialog();
+            }
+        });
 
         binding.kolomSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -119,6 +126,12 @@ public class TabAdminFragment extends Fragment {
                 });
     }
 
+    private void showAddDialog() {
+        DialogAddUserActivity dialog = new DialogAddUserActivity();
+        dialog.setOnUserAddedListener(this);
+        dialog.showNow(getActivity().getSupportFragmentManager(), "add_konsumen");
+    }
+
     private void dataAdmin() {
         showLoading();
         AndroidNetworking.get(URL_USER)
@@ -155,6 +168,44 @@ public class TabAdminFragment extends Fragment {
                         Log.e("error", "onError: " + anError.getErrorBody());
                     }
                 });
+    }
+
+    @Override
+    public void onUserAdded(String message) {
+        showSuccessNotification(message);
+    }
+
+    @Override
+    public void onUserError(String errorMessage) {
+        showErrorNotification(errorMessage);
+    }
+
+    private void showSuccessNotification(String message) {
+        PopupDialog.getInstance(mContext)
+                .statusDialogBuilder()
+                .createSuccessDialog()
+                .setHeading("BERHASIL !!!")
+                .setDescription(message)
+                .setCancelable(false)
+                .build(dialog -> {
+                    dataAdmin();
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void showErrorNotification(String message) {
+        PopupDialog.getInstance(mContext)
+                .statusDialogBuilder()
+                .createErrorDialog()
+                .setHeading("GAGAL !!!")
+                .setDescription(message)
+                .setCancelable(false)
+                .build(dialog -> {
+                    dataAdmin();
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void initLoadingDialog() {

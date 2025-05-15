@@ -4,15 +4,13 @@ include_once '../dbset/dbconnect.php';
 $response = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id_user = $_POST['id_user'];
     $nama = $_POST['nama'];
     $nohp = $_POST['nohp'];
-    $role = $_POST['role'];
+    $username = $_POST['username'];
     $email = $_POST['email'];
-    $email = $_POST['username'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM tb_user WHERE email='$username'";
+    $query = "SELECT * FROM tb_user WHERE username='$username'";
     $checkquery = mysqli_query($conn, $query);
 
     if (mysqli_num_rows($checkquery) > 1) {
@@ -24,10 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $fileMenu = basename($gambar);
             if (move_uploaded_file($_FILES["gambar"]["tmp_name"], $targetDir . $fileMenu)) {
                 if (!empty($_POST['gambar'])) {
-                    $gambar_pet_lama = $_POST['gambar'];
-                    unlink($targetDir . $gambar_pet_lama);
+                    $gambar_lama = $_POST['gambar'];
+                    unlink($targetDir . $gambar_lama);
                 }
-                $query = "UPDATE tb_user SET email='$email',username='$username',password='$password',nama='$nama',nohp='$nohp',role='$role',profile='$gambar' WHERE id_user='$id_user'";
+                $query = "INSERT INTO tb_user (nama, email, nohp, username, password, role, profile) VALUES ('$nama', '$email','$nohp', '$username', '$password', 'Administrator', '$gambar')";
                 $execute = mysqli_query($conn, $query);
                 $check = mysqli_affected_rows($conn);
                 if ($check > 0) {
@@ -41,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $response["message"] = "Gagal upload gambar";
             }
         } else {
-            $query = "UPDATE tb_user SET email='$email',username='$username',password='$password',nama='$nama',nohp='$nohp',role='$role' WHERE id_user='$id_user'";
+            $query = "INSERT INTO tb_user (nama, email, nohp, username, password, role) VALUES ('$nama', '$email','$nohp', '$username', '$password', 'Administrator')";
             $execute = mysqli_query($conn, $query);
             $check = mysqli_affected_rows($conn);
 

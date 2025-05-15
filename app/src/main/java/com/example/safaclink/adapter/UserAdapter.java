@@ -193,7 +193,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
         PopupDialog.getInstance(context)
                 .statusDialogBuilder()
                 .createErrorDialog()
-                .setHeading("Berhasil")
+                .setHeading("GAGAL !!!")
                 .setDescription(message)
                 .setCancelable(true)
                 .build(dialog -> {
