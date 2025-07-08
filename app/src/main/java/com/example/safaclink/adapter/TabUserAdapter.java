@@ -22,8 +22,8 @@ public class TabUserAdapter extends FragmentStateAdapter {
                 return new TabAdminFragment();
             case 1:
                 return new TabKonsumenFragment();
-//            case 2:
-//                return new TabOwnerFragment();
+            case 2:
+                return new TabOwnerFragment();
             default:
                 return new TabAdminFragment();
         }

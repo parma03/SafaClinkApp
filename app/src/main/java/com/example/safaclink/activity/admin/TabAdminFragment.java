@@ -43,7 +43,6 @@ public class TabAdminFragment extends Fragment implements DialogAddUserActivity.
     private UserAdapter userAdapter;
     private Dialog loadingDialog;
     private static final String URL_USER = ApiServer.site_url_admin + "getAdmin.php";
-    private static final String URL_SEARCH_ADMIN = ApiServer.site_url_admin + "searchAdmin.php";
     private Context mContext;
 
     @Override
@@ -58,78 +57,7 @@ public class TabAdminFragment extends Fragment implements DialogAddUserActivity.
         initLoadingDialog();
         dataAdmin();
 
-        binding.btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showAddDialog();
-            }
-        });
-
-        binding.kolomSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String keyword = s.toString().trim();
-                searchData(keyword);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
         return binding.getRoot();
-    }
-
-    private void searchData(String keyword) {
-        showLoading();
-        AndroidNetworking.post(URL_SEARCH_ADMIN)
-                .addBodyParameter("keyword", keyword)
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            hideLoading();
-                            int code = response.getInt("code");
-                            Log.d("response", "response::" + response);
-                            if (code == 1) {
-                                JSONArray array = response.getJSONArray("data");
-                                userModelList.clear();
-                                Gson gson = new Gson();
-                                for (int i = 0; i < array.length(); i++) {
-                                    JSONObject userObject = array.getJSONObject(i);
-                                    UserModel user = gson.fromJson(userObject.toString(), UserModel.class);
-                                    userModelList.add(user);
-                                }
-                                userAdapter = new UserAdapter(requireContext(), userModelList);
-                                binding.recyclerView.setAdapter(userAdapter);
-                            } else {
-                                userModelList.clear();
-                                userAdapter.notifyDataSetChanged();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.d("catch", "gambarModel::" + e.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-                        hideLoading();
-                        Log.e("error", "onError: " + anError.getErrorBody());
-                    }
-                });
-    }
-
-    private void showAddDialog() {
-        DialogAddUserActivity dialog = new DialogAddUserActivity();
-        dialog.setOnUserAddedListener(this);
-        dialog.showNow(getActivity().getSupportFragmentManager(), "add_konsumen");
     }
 
     private void dataAdmin() {

@@ -32,8 +32,28 @@ import org.json.JSONObject;
 
 public class DialogAddUserActivity extends AppCompatDialogFragment {
     private EditText editNama, editNohp, editEmail, editUsername, editPassword;
-    private static final String URL_ADD_USER =
-            ApiServer.site_url_admin + "addAdmin.php";
+    private static final String URL_ADD_ADMIN = ApiServer.site_url_admin + "addAdmin.php";
+    private static final String URL_ADD_KONSUMEN = ApiServer.site_url_admin + "addKonsumen.php";
+    private static final String URL_ADD_OWNER = ApiServer.site_url_admin + "addOwner.php";
+    private String userType;
+
+    public static DialogAddUserActivity newInstance(String userType) {
+        DialogAddUserActivity dialog = new DialogAddUserActivity();
+        Bundle args = new Bundle();
+        args.putString("user_type", userType);
+        dialog.setArguments(args);
+        return dialog;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userType = getArguments().getString("user_type", "admin");
+        } else {
+            userType = "admin"; // default
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -47,8 +67,10 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
         editUsername = view.findViewById(R.id.editUsername);
         editPassword = view.findViewById(R.id.editPassword);
 
+        String dialogTitle = "Add " + userType.substring(0, 1).toUpperCase() + userType.substring(1);
+
         builder.setView(view)
-                .setTitle("Add User")
+                .setTitle(dialogTitle)
                 .setNegativeButton("Batal", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -74,6 +96,18 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
 
     public void setOnUserAddedListener(OnUserAddedListener listener) {
         this.onUserAddedListener = listener;
+    }
+
+    private String getAddUserURL() {
+        switch (userType.toLowerCase()) {
+            case "konsumen":
+                return URL_ADD_KONSUMEN;
+            case "owner":
+                return URL_ADD_OWNER;
+            case "admin":
+            default:
+                return URL_ADD_ADMIN;
+        }
     }
 
     private void AddUser(){
@@ -105,10 +139,10 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
         }
 
         if (addUsername.isEmpty()) {
-            editNohp.setError("Username tidak boleh kosong");
+            editUsername.setError("Username tidak boleh kosong");
             return;
         } else {
-            editNohp.setError(null);
+            editUsername.setError(null);
         }
 
         if (addPassword.isEmpty()) {
@@ -124,7 +158,11 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
         editNohp.setError(null);
         editPassword.setError(null);
 
-        AndroidNetworking.post(URL_ADD_USER)
+        // Gunakan URL yang sesuai berdasarkan tipe user
+        String urlToUse = getAddUserURL();
+        Log.d("AddUser", "Using URL: " + urlToUse + " for user type: " + userType);
+
+        AndroidNetworking.post(urlToUse)
                 .addBodyParameter("nama", addName)
                 .addBodyParameter("nohp", addNohp)
                 .addBodyParameter("email", addEmail)
@@ -139,7 +177,7 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
                             Log.d("response", "response::" + response);
                             if (response.getString("code").equals("1")) {
                                 if (onUserAddedListener != null) {
-                                    onUserAddedListener.onUserAdded("Add User Berhasil");
+                                    onUserAddedListener.onUserAdded("Add " + userType + " Berhasil");
                                 }
                             } else if (response.getString("code").equals("2")) {
                                 if (onUserAddedListener != null) {
@@ -147,13 +185,13 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
                                 }
                             } else {
                                 if (onUserAddedListener != null) {
-                                    onUserAddedListener.onUserError("Add User Gagal");
+                                    onUserAddedListener.onUserError("Add " + userType + " Gagal");
                                 }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             if (onUserAddedListener != null) {
-                                onUserAddedListener.onUserError("Add User Gagal");
+                                onUserAddedListener.onUserError("Add " + userType + " Gagal");
                             }
                         }
                     }
@@ -162,7 +200,7 @@ public class DialogAddUserActivity extends AppCompatDialogFragment {
                     public void onError(ANError anError) {
                         Log.d("response", "eror::" + anError);
                         if (onUserAddedListener != null) {
-                            onUserAddedListener.onUserError("Tambah Data User GAGAL");
+                            onUserAddedListener.onUserError("Tambah Data " + userType + " GAGAL");
                         }
                     }
                 });

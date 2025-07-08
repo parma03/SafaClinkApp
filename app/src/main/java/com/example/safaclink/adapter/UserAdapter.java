@@ -7,15 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.androidnetworking.AndroidNetworking;
@@ -25,8 +22,6 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.safaclink.R;
 import com.example.safaclink.activity.admin.DialogDetailUserActivity;
 import com.example.safaclink.activity.admin.DialogUpdateUserActivity;
-import com.example.safaclink.activity.admin.TabAdminFragment;
-import com.example.safaclink.activity.admin.UserActivity;
 import com.example.safaclink.apiserver.ApiServer;
 import com.example.safaclink.model.UserModel;
 import com.saadahmedev.popupdialog.PopupDialog;
@@ -73,7 +68,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
         } else {
             holder.imgProfile.setImageResource(R.mipmap.icon_user_foreground);
         }
-
 
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,7 +265,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
     public class UserModelViewHolder extends RecyclerView.ViewHolder {
         TextView txtName, txtRole;
         ImageView imgProfile;
-        RelativeLayout layoutDelete, layoutUpdate;
+        View layoutDelete, layoutUpdate;
         CardView card;
 
         private Context context;

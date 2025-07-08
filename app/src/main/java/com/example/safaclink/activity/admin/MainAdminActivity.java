@@ -55,5 +55,13 @@ public class MainAdminActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        binding.cardPaket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainAdminActivity.this, PaketActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

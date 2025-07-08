@@ -2,7 +2,7 @@ package com.example.safaclink.apiserver;
 
 public class ApiServer {
     //development
-    private static final String URL = "https://052b-2404-8000-1096-4044-140f-777b-d0c7-e92e.ngrok-free.app/fauzan/SafaClinkApp/app/src/main/java/com/example/safaclink/phpserver/";
+    private static final String URL = "https://2f49e0f5ca7e.ngrok-free.app/fauzan/SafaClinkApp/app/src/main/java/com/example/safaclink/phpserver/";
     public static final String site_url_admin = URL+"admin/";
     public static final String site_url_konsumen = URL+"konsumen/";
     public static final String site_url_owner = URL+"owner/";

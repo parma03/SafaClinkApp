@@ -1,71 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activity.admin.TabAdminFragment">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Content Section -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp">
 
-        <LinearLayout
-            android:id="@+id/linearLayout1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <EditText
-                android:id="@+id/kolomSearch"
-                android:layout_width="10dp"
-                android:layout_height="60dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_white"
-                android:drawableStart="@drawable/baseline_search_24"
-                android:drawablePadding="16dp"
-                android:elevation="3dp"
-                android:ems="10"
-                android:focusable="true"
-                android:hint="SEARCH..."
-                android:textColorHint="@color/black"
-                android:padding="16dp"
-                android:textColor="@color/black"
-                android:textStyle="bold" />
-            <Button
-                android:id="@+id/btnAdd"
-                android:layout_width="10dp"
-                android:layout_height="60dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:background="@drawable/btn_global"
-                android:focusable="true"
-                android:textColor="@color/text"
-                android:text="ADD"
-                android:textStyle="bold" />
-        </LinearLayout>
-
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/row_user"/>
+            tools:listitem="@layout/row_user" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+        <!-- Empty State for Fragment -->
+        <LinearLayout
+            android:id="@+id/emptyStateLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:alpha="0.3"
+                android:src="@mipmap/icon_empty_foreground"
+                app:tint="@color/textColor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Tidak ada data"
+                android:textColor="@color/textColor"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Data akan muncul di sini"
+                android:textColor="@color/textColor"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Loading Indicator for Fragment -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

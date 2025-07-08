@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nohp = $_POST['nohp'];
     $role = $_POST['role'];
     $email = $_POST['email'];
-    $email = $_POST['username'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     $query = "SELECT * FROM tb_user WHERE email='$username'";
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 } else {
     $response["code"] = 0;
-    $response["message"] = "Tidak ada input Konsumen";
+    $response["message"] = "Tidak ada input";
 }
 
 echo json_encode($response);
