@@ -1,11 +1,10 @@
-package com.example.safaclink.activity.admin;
+package com.example.safaclink.activity.konsumen;
 
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +18,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.safaclink.R;
-import com.example.safaclink.adapter.PaketAdapter;
+import com.example.safaclink.adapter.PaketKonsumenAdapter;
 import com.example.safaclink.apiserver.ApiServer;
 import com.example.safaclink.databinding.ActivityPaketBinding;
 import com.example.safaclink.model.PaketModel;
@@ -33,40 +32,36 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaketActivity extends AppCompatActivity implements DialogAddPaketActivity.OnPaketAddedListener {
+public class PaketActivity extends AppCompatActivity implements DialogPesanActivity.OnPacketPesanListener {
     private ActivityPaketBinding binding;
     private List<PaketModel> paketModelList;
-    private PaketAdapter paketAdapter;
+    private PaketKonsumenAdapter paketKonsumenAdapter;
     private Dialog loadingDialog;
-    private static final String URL_PAKET = ApiServer.site_url_admin + "getPaket.php";
-    private static final String URL_SEARCH = ApiServer.site_url_admin + "searchPaket.php";
-    private static final String URL_COUNT = ApiServer.site_url_admin + "countPaket.php";
+    private static final String URL_PAKET = ApiServer.site_url_konsumen + "getPaket.php";
+    private static final String URL_SEARCH = ApiServer.site_url_konsumen + "searchPaket.php";
+    private static final String URL_COUNT = ApiServer.site_url_konsumen + "countPaket.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+
+        // Initialize binding
         binding = ActivityPaketBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        EdgeToEdge.enable(PaketActivity.this);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         binding.rvPaket.setHasFixedSize(true);
         binding.rvPaket.setLayoutManager(new LinearLayoutManager(PaketActivity.this));
         paketModelList = new ArrayList<>();
-
         initLoadingDialog();
         dataPaket();
         countPaket();
-
-        binding.fabAddPaket.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showAddDialog();
-            }
-        });
 
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -76,13 +71,71 @@ public class PaketActivity extends AppCompatActivity implements DialogAddPaketAc
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String keyword = s.toString().trim();
-                searchData(keyword);
+                if (keyword.isEmpty()) {
+                    dataPaket(); // Reload all data when search is empty
+                } else {
+                    searchData(keyword);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+
+    private void searchData(String keyword) {
+        if (keyword.isEmpty()) {
+            dataPaket();
+            return;
+        }
+
+        showLoading();
+        AndroidNetworking.post(URL_SEARCH)
+                .addBodyParameter("keyword", keyword)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            hideLoading();
+                            int code = response.getInt("code");
+                            Log.d("response", "response::" + response);
+                            if (code == 1) {
+                                JSONArray array = response.getJSONArray("data");
+                                paketModelList.clear();
+                                Gson gson = new Gson();
+                                for (int i = 0; i < array.length(); i++) {
+                                    JSONObject userObject = array.getJSONObject(i);
+                                    PaketModel paket = gson.fromJson(userObject.toString(), PaketModel.class);
+                                    paketModelList.add(paket);
+                                }
+                                if (paketKonsumenAdapter == null) {
+                                    paketKonsumenAdapter = new PaketKonsumenAdapter(PaketActivity.this, paketModelList);
+                                    binding.rvPaket.setAdapter(paketKonsumenAdapter);
+                                } else {
+                                    paketKonsumenAdapter.notifyDataSetChanged();
+                                }
+                            } else {
+                                paketModelList.clear();
+                                if (paketKonsumenAdapter != null) {
+                                    paketKonsumenAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            hideLoading();
+                            Log.d("catch", "searchData error::" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        hideLoading();
+                        Log.e("error", "onError: " + anError.getErrorBody());
+                    }
+                });
     }
 
     private void countPaket() {
@@ -118,54 +171,6 @@ public class PaketActivity extends AppCompatActivity implements DialogAddPaketAc
                 });
     }
 
-    private void searchData(String keyword) {
-        showLoading();
-        AndroidNetworking.post(URL_SEARCH)
-                .addBodyParameter("keyword", keyword)
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            hideLoading();
-                            int code = response.getInt("code");
-                            Log.d("response", "response::" + response);
-                            if (code == 1) {
-                                JSONArray array = response.getJSONArray("data");
-                                paketModelList.clear();
-                                Gson gson = new Gson();
-                                for (int i = 0; i < array.length(); i++) {
-                                    JSONObject userObject = array.getJSONObject(i);
-                                    PaketModel paket = gson.fromJson(userObject.toString(), PaketModel.class);
-                                    paketModelList.add(paket);
-                                }
-                                paketAdapter = new PaketAdapter(PaketActivity.this, paketModelList);
-                                binding.rvPaket.setAdapter(paketAdapter);
-                            } else {
-                                paketModelList.clear();
-                                paketAdapter.notifyDataSetChanged();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.d("catch", "gambarModel::" + e.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-                        hideLoading();
-                        Log.e("error", "onError: " + anError.getErrorBody());
-                    }
-                });
-    }
-
-    private void showAddDialog() {
-        DialogAddPaketActivity dialog = new DialogAddPaketActivity();
-        dialog.setOnPaketAddedListener(this);
-        dialog.showNow(getSupportFragmentManager(), "add_konsumen");
-    }
-
     private void dataPaket() {
         showLoading();
         AndroidNetworking.get(URL_PAKET)
@@ -186,9 +191,9 @@ public class PaketActivity extends AppCompatActivity implements DialogAddPaketAc
                                     PaketModel isi = gson.fromJson(beritaObject + "", PaketModel.class);
                                     paketModelList.add(isi);
                                 }
-                                paketAdapter = new PaketAdapter(PaketActivity.this, paketModelList);
-                                paketAdapter.setOnPaketListChangedListener(() -> dataPaket());
-                                binding.rvPaket.setAdapter(paketAdapter);
+                                paketKonsumenAdapter = new PaketKonsumenAdapter(PaketActivity.this, paketModelList);
+                                paketKonsumenAdapter.setOnPaketListChangedListener(() -> dataPaket());
+                                binding.rvPaket.setAdapter(paketKonsumenAdapter);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -205,12 +210,12 @@ public class PaketActivity extends AppCompatActivity implements DialogAddPaketAc
     }
 
     @Override
-    public void onPaketAdded(String message) {
+    public void onPesanAdded(String message) {
         showSuccessNotification(message);
     }
 
     @Override
-    public void onPaketError(String errorMessage) {
+    public void onPesanError(String errorMessage) {
         showErrorNotification(errorMessage);
     }
 

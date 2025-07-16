@@ -2,8 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -16,26 +25,45 @@
         android:theme="@style/Theme.SafaClink"
         tools:targetApi="31">
         <activity
-            android:name=".activity.admin.DialogAddPaketActivity"
+            android:name=".activity.konsumen.InvoiceActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.konsumen.OrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.konsumen.DialogPesanActivity"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <activity
+            android:name=".activity.konsumen.PaketActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.admin.DialogAddPaketActivity"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.DialogDetailPaketActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.DialogUpdatePaketActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.PaketActivity"
             android:exported="false" />
         <activity
             android:name=".activity.admin.DialogAddUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.DialogDetailUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.DialogUpdateUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".activity.admin.UserActivity"
             android:exported="false" />
@@ -63,6 +91,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.safaclink.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="preloaded_fonts"
