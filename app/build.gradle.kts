@@ -45,11 +45,20 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Existing dependencies
     implementation(libs.android.networking)
-    implementation (libs.popup.dialog)
+    implementation(libs.popup.dialog)
     implementation(libs.spots.dialog)
-    implementation (libs.databinding.runtime)
+    implementation(libs.databinding.runtime)
     implementation(libs.picasso)
     implementation(libs.swipereveallayout)
+
+    // New dependencies for image handling, location, and payment
+    implementation(libs.glide)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
+    implementation(libs.uikit)
+    implementation(libs.exifinterface)
 
 }

@@ -2,6 +2,8 @@
 agp = "8.8.0"
 androidNetworking = "1.0.4"
 databindingRuntime = "8.8.2"
+exifinterface = "1.3.6"
+glide = "4.15.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -9,14 +11,19 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
+playServicesLocation = "21.0.1"
+playServicesMaps = "18.1.0"
 popupDialog = "2.0.0"
 spotsDialog = "0.7"
 picasso = "2.71828"
 swipereveallayout = "1.4.0"
+uikit = "2.0.0-SANDBOX"
 
 [libraries]
 android-networking = { module = "com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking", version.ref = "androidNetworking" }
 databinding-runtime = { module = "androidx.databinding:databinding-runtime", version.ref = "databindingRuntime" }
+exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -24,10 +31,13 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 popup-dialog = { module = "com.saadahmedev.popup-dialog:popup-dialog", version.ref = "popupDialog" }
 spots-dialog = { module = "com.github.d-max:spots-dialog", version.ref = "spotsDialog" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 swipereveallayout = { module = "com.github.chthai64:SwipeRevealLayout", version.ref = "swipereveallayout" }
+uikit = { module = "com.midtrans:uikit", version.ref = "uikit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

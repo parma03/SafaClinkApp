@@ -61,6 +61,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
             holder.txtRole.setText(userModel.getRole());
         }
 
+        if (holder.txtEmail != null) {
+            holder.txtEmail.setText(userModel.getEmail());
+        }
+
         if (userModel.getProfile() != null && !userModel.getProfile().equals("null")) {
             Picasso.get()
                     .load(ApiServer.site_url_fotoProfile + userModel.getProfile())
@@ -263,7 +267,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
     }
 
     public class UserModelViewHolder extends RecyclerView.ViewHolder {
-        TextView txtName, txtRole;
+        TextView txtName, txtRole, txtEmail;
         ImageView imgProfile;
         View layoutDelete, layoutUpdate;
         CardView card;
@@ -275,6 +279,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserModelViewH
             card = itemView.findViewById(R.id.card);
             txtName = itemView.findViewById(R.id.txtNama);
             txtRole = itemView.findViewById(R.id.txtRole);
+            txtEmail = itemView.findViewById(R.id.txtEmail);
             imgProfile = itemView.findViewById(R.id.imgProfile);
             layoutDelete = itemView.findViewById(R.id.layoutDelete);
             layoutUpdate = itemView.findViewById(R.id.layoutEdit);
