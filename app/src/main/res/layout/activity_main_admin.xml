@@ -221,44 +221,6 @@
                     tools:layout_editor_absoluteY="23dp">
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/cardOrders"
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="10dp"
-                        android:clickable="true"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="3dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp">
-
-                                <ImageView
-                                    android:layout_width="60dp"
-                                    android:layout_height="60dp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent"
-                                    app:srcCompat="@drawable/baseline_bookmark_border_24" />
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/bangers"
-                                android:gravity="center"
-                                android:text="Orders"
-                                android:textColor="@color/textColor" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
                         android:id="@+id/cardTransaksi"
                         android:layout_width="100dp"
                         android:layout_height="match_parent"

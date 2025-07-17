@@ -30,9 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                   LEFT JOIN tb_paket p ON t.id_paket = p.id_paket
                   LEFT JOIN tb_user u ON t.id_pelanggan = u.id_user
                   LEFT JOIN tb_orders o ON t.order_id = o.order_id
-                  WHERE t.status_transaksi = 'paid'
-                  AND o.status_order = 'dijemput'
-                  AND t.id_pelanggan = '$id_user'
+                  WHERE o.status_order = 'diantar' AND t.id_pelanggan = '$id_user'
                   ORDER BY t.created_at DESC";
 
         $execute = mysqli_query($conn, $query);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +26,23 @@ import java.util.List;
 import java.util.Locale;
 
 public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdapter.OrdersModelViewHolder> {
+    private static final String TAG = "OrderKonsumenAdapter";
     private Context context;
     private List<CombinedOrderModel> combinedOrderModels;
     private OnPrintInvoiceListener printInvoiceListener;
+    private OnKonfirmasiListener konfirmasiListener;
+    private String userRole; // "admin" atau "konsumen"
 
     public OrderKonsumenAdapter(Context context, List<CombinedOrderModel> combinedOrderModels) {
         this.context = context;
         this.combinedOrderModels = combinedOrderModels;
+        this.userRole = "konsumen"; // default
+    }
+
+    public OrderKonsumenAdapter(Context context, List<CombinedOrderModel> combinedOrderModels, String userRole) {
+        this.context = context;
+        this.combinedOrderModels = combinedOrderModels;
+        this.userRole = userRole;
     }
 
     // Interface untuk handle print invoice
@@ -39,8 +50,17 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
         void onPrintInvoice(CombinedOrderModel orderModel);
     }
 
+    // Interface untuk handle konfirmasi
+    public interface OnKonfirmasiListener {
+        void onKonfirmasi(CombinedOrderModel orderModel);
+    }
+
     public void setOnPrintInvoiceListener(OnPrintInvoiceListener listener) {
         this.printInvoiceListener = listener;
+    }
+
+    public void setOnKonfirmasiListener(OnKonfirmasiListener listener) {
+        this.konfirmasiListener = listener;
     }
 
     @NonNull
@@ -107,11 +127,16 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
         }
 
         // Handle button cetak invoice
-        holder.btnCetakInvoice.setOnClickListener(v -> {
-            if (printInvoiceListener != null) {
-                printInvoiceListener.onPrintInvoice(combinedOrderModel);
-            }
-        });
+        if (holder.btnCetakInvoice != null) {
+            holder.btnCetakInvoice.setOnClickListener(v -> {
+                if (printInvoiceListener != null) {
+                    printInvoiceListener.onPrintInvoice(combinedOrderModel);
+                }
+            });
+        }
+
+        // Handle button konfirmasi berdasarkan role dan status
+        setupKonfirmasiButton(holder, combinedOrderModel, position);
 
         // Hide swipe actions for konsumen view
         if (holder.layoutDelete != null) {
@@ -119,6 +144,104 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
         }
         if (holder.layoutUpdate != null) {
             holder.layoutUpdate.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupKonfirmasiButton(OrdersModelViewHolder holder, CombinedOrderModel combinedOrderModel, int position) {
+        if (holder.btnKonfirmasi == null) {
+            Log.w(TAG, "btnKonfirmasi is null at position " + position);
+            return;
+        }
+
+        String statusOrder = combinedOrderModel.getStatus_order();
+        String statusTransaksi = combinedOrderModel.getStatus_transaksi();
+
+        // Log untuk debugging
+        Log.d(TAG, "Position: " + position +
+                ", Order ID: " + combinedOrderModel.getOrder_id() +
+                ", Status Order: " + statusOrder +
+                ", Status Transaksi: " + statusTransaksi +
+                ", User Role: " + userRole);
+
+        // Normalize null values
+        String normalizedStatusOrder = (statusOrder == null || statusOrder.equals("null") || statusOrder.isEmpty()) ? null : statusOrder;
+        String normalizedStatusTransaksi = (statusTransaksi == null || statusTransaksi.equals("null") || statusTransaksi.isEmpty()) ? null : statusTransaksi;
+
+        if ("admin".equals(userRole)) {
+            // Logic untuk Admin
+            if (normalizedStatusOrder == null && "paid".equals(normalizedStatusTransaksi)) {
+                // Pesanan baru dibayar, belum ada di tb_orders
+                holder.btnKonfirmasi.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasi.setText("Jemput Pesanan");
+                holder.btnKonfirmasi.setOnClickListener(v -> {
+                    Log.d(TAG, "Button Jemput Pesanan clicked for order: " + combinedOrderModel.getOrder_id());
+                    if (konfirmasiListener != null) {
+                        konfirmasiListener.onKonfirmasi(combinedOrderModel);
+                    } else {
+                        Log.w(TAG, "konfirmasiListener is null");
+                    }
+                });
+                Log.d(TAG, "Button set to: Jemput Pesanan");
+
+            } else if ("dijemput".equals(normalizedStatusOrder)) {
+                // Admin bisa mengerjakan pesanan
+                holder.btnKonfirmasi.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasi.setText("Kerjakan Pesanan");
+                holder.btnKonfirmasi.setOnClickListener(v -> {
+                    Log.d(TAG, "Button Kerjakan Pesanan clicked for order: " + combinedOrderModel.getOrder_id());
+                    if (konfirmasiListener != null) {
+                        konfirmasiListener.onKonfirmasi(combinedOrderModel);
+                    }
+                });
+                Log.d(TAG, "Button set to: Kerjakan Pesanan");
+
+            } else if ("dikerjakan".equals(normalizedStatusOrder)) {
+                // Admin bisa mengantar pesanan
+                holder.btnKonfirmasi.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasi.setText("Antar Pesanan");
+                holder.btnKonfirmasi.setOnClickListener(v -> {
+                    Log.d(TAG, "Button Antar Pesanan clicked for order: " + combinedOrderModel.getOrder_id());
+                    if (konfirmasiListener != null) {
+                        konfirmasiListener.onKonfirmasi(combinedOrderModel);
+                    }
+                });
+                Log.d(TAG, "Button set to: Antar Pesanan");
+
+            } else if ("dikonfirmasi".equals(normalizedStatusOrder)) {
+                // Admin bisa menyelesaikan pesanan
+                holder.btnKonfirmasi.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasi.setText("Selesaikan Pesanan");
+                holder.btnKonfirmasi.setOnClickListener(v -> {
+                    Log.d(TAG, "Button Selesaikan Pesanan clicked for order: " + combinedOrderModel.getOrder_id());
+                    if (konfirmasiListener != null) {
+                        konfirmasiListener.onKonfirmasi(combinedOrderModel);
+                    }
+                });
+                Log.d(TAG, "Button set to: Selesaikan Pesanan");
+
+            } else {
+                // Status lainnya (diantar, selesai) - hide button
+                holder.btnKonfirmasi.setVisibility(View.GONE);
+                Log.d(TAG, "Button hidden for status: " + normalizedStatusOrder);
+            }
+        } else {
+            // Logic untuk Konsumen
+            if ("diantar".equals(normalizedStatusOrder)) {
+                // Konsumen bisa konfirmasi penerimaan
+                holder.btnKonfirmasi.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasi.setText("Konfirmasi Diterima");
+                holder.btnKonfirmasi.setOnClickListener(v -> {
+                    Log.d(TAG, "Button Konfirmasi Diterima clicked for order: " + combinedOrderModel.getOrder_id());
+                    if (konfirmasiListener != null) {
+                        konfirmasiListener.onKonfirmasi(combinedOrderModel);
+                    }
+                });
+                Log.d(TAG, "Button set to: Konfirmasi Diterima");
+            } else {
+                // Status lainnya - hide button
+                holder.btnKonfirmasi.setVisibility(View.GONE);
+                Log.d(TAG, "Button hidden for konsumen, status: " + normalizedStatusOrder);
+            }
         }
     }
 
@@ -133,7 +256,7 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
     }
 
     private String getStatusText(String status) {
-        if (status == null) {
+        if (status == null || status.equals("null") || status.isEmpty()) {
             return "Menunggu Konfirmasi";
         }
 
@@ -142,6 +265,8 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
                 return "Sedang Dijemput";
             case "dikerjakan":
                 return "Sedang Dikerjakan";
+            case "diantar":
+                return "Sedang Diantar";
             case "dikonfirmasi":
                 return "Dikonfirmasi";
             case "selesai":
@@ -171,7 +296,7 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
         CardView card;
         ImageView imgFoto;
         TextView tvNamaPaket, tvKodePaket, tvHarga, tvTipe, tvDeskripsi, tvStatus;
-        Button btnCetakInvoice;
+        Button btnCetakInvoice, btnKonfirmasi;
 
         public OrdersModelViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -186,6 +311,7 @@ public class OrderKonsumenAdapter extends RecyclerView.Adapter<OrderKonsumenAdap
             layoutUpdate = itemView.findViewById(R.id.cardUpdate);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             btnCetakInvoice = itemView.findViewById(R.id.btnCetakInvoice);
+            btnKonfirmasi = itemView.findViewById(R.id.btnKonfirmasi);
         }
     }
 }
