@@ -3,7 +3,7 @@
 include_once '../dbset/dbconnect.php';
 
 // Midtrans Configuration
-//$server_key = '';
+$server_key = 'Mid-server-CpNVYcSpc48rJb3C4TS0wQMc';
 $is_production = false;
 
 // Get notification data

@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Set your server key (Note: Server key for sandbox and production mode are different)
-//$server_key = '';
+$server_key = 'Mid-server-CpNVYcSpc48rJb3C4TS0wQMc';
 // Set true for production, set false for sandbox
 $is_production = false;
 

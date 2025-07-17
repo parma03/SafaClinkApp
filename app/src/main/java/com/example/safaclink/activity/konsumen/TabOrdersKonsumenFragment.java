@@ -20,6 +20,7 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.safaclink.R;
 import com.example.safaclink.adapter.OrderKonsumenAdapter;
 import com.example.safaclink.apiserver.ApiServer;
+import com.example.safaclink.apiserver.PrefManager;
 import com.example.safaclink.databinding.FragmentTabOrdersKonsumenBinding;
 import com.example.safaclink.model.CombinedOrderModel;
 import com.google.gson.Gson;
@@ -39,6 +40,8 @@ public class TabOrdersKonsumenFragment extends Fragment implements OrderKonsumen
     private static final String URL_ORDER = ApiServer.site_url_konsumen + "getOrder.php";
     private Context mContext;
     private OrderKonsumenAdapter orderKonsumenAdapter;
+    private PrefManager prefManager;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,6 +55,7 @@ public class TabOrdersKonsumenFragment extends Fragment implements OrderKonsumen
         // Initialize list
         combinedOrderModels = new ArrayList<>();
         mContext = requireContext();
+        prefManager = new PrefManager(mContext);
 
         // Initialize loading dialog
         initLoadingDialog();
@@ -64,7 +68,7 @@ public class TabOrdersKonsumenFragment extends Fragment implements OrderKonsumen
 
     private void dataOrders() {
         showLoading();
-        AndroidNetworking.get(URL_ORDER)
+        AndroidNetworking.get(URL_ORDER + "?id_user=" + prefManager.getId())
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
