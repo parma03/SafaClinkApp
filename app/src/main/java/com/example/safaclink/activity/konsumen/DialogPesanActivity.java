@@ -114,6 +114,9 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
     private static final String base_url = ApiServer.site_url_konsumen + "presponse.php/";
     private static final String URL_CREATE_TRANSAKSI = ApiServer.site_url_konsumen + "createTransaksi.php";
 
+    // konstanta map picker
+    private static final int REQUEST_MAP_PICKER = 6;
+
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -266,8 +269,8 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
         // Upload foto
         btnUploadFoto.setOnClickListener(v -> showImagePickerDialog());
 
-        // Location
-        btnAmbilLokasi.setOnClickListener(v -> getCurrentLocation());
+        // Location - ubah ini untuk membuka map picker
+        btnAmbilLokasi.setOnClickListener(v -> openMapPicker());
 
         // Item quantity
         btnMinusItem.setOnClickListener(v -> {
@@ -305,6 +308,18 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void openMapPicker() {
+        Intent intent = new Intent(context, MapPickerActivity.class);
+
+        // Kirim current location jika sudah ada
+        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+            intent.putExtra("current_lat", currentLatitude);
+            intent.putExtra("current_lng", currentLongitude);
+        }
+
+        startActivityForResult(intent, REQUEST_MAP_PICKER);
     }
 
     private void calculateTotal() {
@@ -428,8 +443,10 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
     }
 
     private void getCurrentLocation() {
+        // Coba GPS terlebih dahulu
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+            // Jika tidak ada permission, langsung buka map picker
+            openMapPicker();
             return;
         }
 
@@ -440,16 +457,20 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
                         currentLatitude = location.getLatitude();
                         currentLongitude = location.getLongitude();
                         locationString = currentLatitude + "," + currentLongitude;
-                        tvStatusLokasi.setText("Lokasi berhasil diambil");
+                        tvStatusLokasi.setText("Lokasi GPS berhasil diambil");
                         tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.success_color));
                     } else {
-                        tvStatusLokasi.setText("Gagal mengambil lokasi");
-                        tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.error_color));
+                        // Jika GPS gagal, buka map picker sebagai fallback
+                        tvStatusLokasi.setText("GPS tidak tersedia, pilih lokasi manual");
+                        tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.warning_color));
+                        openMapPicker();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    tvStatusLokasi.setText("Gagal mengambil lokasi");
-                    tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.error_color));
+                    // Jika GPS gagal, buka map picker sebagai fallback
+                    tvStatusLokasi.setText("GPS gagal, pilih lokasi manual");
+                    tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.warning_color));
+                    openMapPicker();
                 });
     }
 
@@ -480,7 +501,6 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
                     if (data != null && data.getData() != null) {
                         Uri imageUri = data.getData();
                         try {
-                            // Menggunakan content resolver untuk mendapatkan bitmap
                             selectedImageBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
                             if (selectedImageBitmap != null) {
                                 ivFotoBarang.setImageBitmap(selectedImageBitmap);
@@ -498,6 +518,35 @@ public class DialogPesanActivity extends AppCompatDialogFragment implements Tran
                     } else {
                         Log.e("Gallery", "No data received from gallery");
                         showErrorDialog("Tidak ada gambar yang dipilih");
+                    }
+                    break;
+
+                // Tambahkan case baru untuk map picker
+                case REQUEST_MAP_PICKER:
+                    if (data != null) {
+                        double selectedLat = data.getDoubleExtra("selected_lat", 0.0);
+                        double selectedLng = data.getDoubleExtra("selected_lng", 0.0);
+                        String selectedAddress = data.getStringExtra("selected_address");
+
+                        if (selectedLat != 0.0 && selectedLng != 0.0) {
+                            currentLatitude = selectedLat;
+                            currentLongitude = selectedLng;
+                            locationString = currentLatitude + "," + currentLongitude;
+
+                            // Update status lokasi
+                            tvStatusLokasi.setText("Lokasi dipilih");
+                            tvStatusLokasi.setTextColor(ContextCompat.getColor(context, R.color.success_color));
+
+                            // Set alamat jika tersedia dan field alamat masih kosong
+                            if (selectedAddress != null && !selectedAddress.isEmpty() &&
+                                    etAlamat.getText().toString().trim().isEmpty()) {
+                                etAlamat.setText(selectedAddress);
+                            }
+
+                            Log.d("MapPicker", "Location selected: " + selectedLat + ", " + selectedLng);
+                        } else {
+                            showErrorDialog("Gagal mendapatkan lokasi yang dipilih");
+                        }
                     }
                     break;
             }

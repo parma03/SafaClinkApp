@@ -54,11 +54,15 @@ dependencies {
     implementation(libs.picasso)
     implementation(libs.swipereveallayout)
 
-    // New dependencies for image handling, location, and payment
+    // Image handling and payment
     implementation(libs.glide)
-    implementation(libs.play.services.location)
-    implementation(libs.play.services.maps)
     implementation(libs.uikit)
     implementation(libs.exifinterface)
 
+    // Location services (keep this for GPS)
+    implementation(libs.play.services.location)
+
+    // OpenStreetMap instead of Google Maps
+    implementation(libs.osmdroid.android)
+    implementation(libs.okhttp)
 }
